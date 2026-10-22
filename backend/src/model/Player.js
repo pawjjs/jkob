@@ -1,9 +1,7 @@
-import { use } from "react";
-
-export default class User {
-    constructor(id, username, password) {
+export default class Player {
+    constructor(id, nick, team) {
         this.id = id;
-        this.username = username;
-        this.password = password;
+        this.nick = nick;
+        this.team = team;
     }   
 }
