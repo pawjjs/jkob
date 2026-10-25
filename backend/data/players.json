@@ -1,1 +1,17 @@
-POST nr8 | 16:30:18
+[
+  {
+    "id": 1,
+    "nick": "Adam",
+    "team": "Red"
+  },
+  {
+    "id": 2,
+    "nick": "Jan",
+    "team": "Blue"
+  },
+  {
+    "id": 3,
+    "nick": "Bartek",
+    "team": "Red"
+  }
+]
