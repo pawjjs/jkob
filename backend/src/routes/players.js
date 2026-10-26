@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { readAllPlayers, addPlayer } from "../services/players.js";
+import { readAllPlayers, addPlayer, readOnePlayer } from "../services/players.js";
 
 const router = Router();
 
@@ -19,6 +19,23 @@ router.post("/", async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+});
+
+router.get("/:id", async (req, res, next)=>{
+try {
+    const id = req.params.id;
+    const player = await readOnePlayer(id);
+
+    if(!player){
+        return res.status(404).json({
+                error: "Nie znaleziono gracza"
+            });
+    }
+    res.json(player);
+
+}catch (error){
+    next(error)
+}
 });
 
 export default router;

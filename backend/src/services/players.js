@@ -19,14 +19,14 @@ export async function addPlayer(dane)
     }
 
     const players = await readAllPlayers();
+    let maxId = 0;
 
     for (const player of players) {
     if (player.id > maxId) {
         maxId = player.id;
-    }
-}
+    }}
 
-const id = maxId + 1;
+    const id = maxId + 1;
 
     const player = new Player(id, nick.trim(), team.trim());
 
@@ -41,7 +41,9 @@ const id = maxId + 1;
     return player;
 }
 
-export function readOnePlayer(id){
+export async function readOnePlayer(id){
+    const players = await readAllPlayers();
+    return players.find(player => player.id === Number(id));
 }
 
 export async function readAllPlayers() {
