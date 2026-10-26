@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Pokój Bartka",
+    "playerIds": [],
+    "status": "waiting",
+    "winnerId": null
+  },
+  {
+    "id": 2,
+    "name": "Pokój Adama",
+    "playerIds": [],
+    "status": "waiting",
+    "winnerId": null
+  },
+  {
+    "id": 3,
+    "name": "XXX",
+    "playerIds": [],
+    "status": "waiting",
+    "winnerId": null
+  }
+]
