@@ -7,7 +7,7 @@ const playerFile = new URL("../../data/players.json", import.meta.url);
 
 export async function addPlayer(dane)
 {
-    const {nick, team} = dane;
+    const {nick, team} = dane || {};
 
     if (
         typeof nick !== "string" || !nick.trim() ||

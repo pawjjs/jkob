@@ -1,0 +1,243 @@
+openapi: 3.0.4
+info:
+  title: Dormsy API
+  version: 1.0.0
+  description: API gry Dormsy. Pozwala dodawać i przeglądać graczy oraz tworzyć i przeglądać gry.
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Gracze
+  - name: Gry
+  - name: Serwer
+paths:
+  /api/players:
+    get:
+      tags:
+        - Gracze
+      summary: Lista graczy
+      responses:
+        "200":
+          description: Gracze
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Player"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+        - Gracze
+      summary: Dodaj gracza
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPlayer"
+      responses:
+        "201":
+          description: Utworzony gracz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      description: Nick i nazwa druzyny nie moga byc puste.
+  /api/players/{id}:
+    get:
+      tags:
+        - Gracze
+      summary: Pobierz gracza po ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 1
+      responses:
+        "200":
+          description: Gracz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/games:
+    get:
+      tags:
+        - Gry
+      summary: Lista pokoi gry
+      responses:
+        "200":
+          description: Pokoje
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+        - Gry
+      summary: Utwórz pokój gry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewGame"
+      responses:
+        "201":
+          description: Utworzony pokój
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+      description: Nazwa nie moze byc pusta ani identyczna z nazwa istniejacej gry.
+  /:
+    get:
+      tags:
+        - Serwer
+      summary: Sprawdz backend
+      responses:
+        "200":
+          description: Backend dziala
+          content:
+            text/html:
+              schema:
+                type: string
+              example: Backend Dormsy działa!
+  /ping:
+    get:
+      tags:
+        - Serwer
+      summary: Sprawdz polaczenie
+      responses:
+        "200":
+          description: Serwer odpowiada
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: pong
+components:
+  schemas:
+    Player:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nick:
+          type: string
+          example: Adam
+        team:
+          type: string
+          example: Red
+      required:
+        - id
+        - nick
+        - team
+    NewPlayer:
+      type: object
+      required:
+        - nick
+        - team
+      properties:
+        nick:
+          type: string
+          minLength: 1
+          example: Dawid
+        team:
+          type: string
+          minLength: 1
+          example: Red
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Pokój Bartka
+        playerIds:
+          type: array
+          items:
+            type: integer
+          example: []
+        status:
+          type: string
+          example: waiting
+        winnerId:
+          type: integer
+          nullable: true
+          example: null
+      required:
+        - id
+        - name
+        - playerIds
+        - status
+        - winnerId
+    NewGame:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: Pokoj testowy
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+  responses:
+    BadRequest:
+      description: Niepoprawne dane lub JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Niepoprawny JSON
+    NotFound:
+      description: Nie znaleziono gracza
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Nie znaleziono gracza
+    ServerError:
+      description: Blad serwera
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Blad serwera
