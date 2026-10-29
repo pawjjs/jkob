@@ -1,0 +1,29 @@
+services:
+  postgres-db:
+    image: postgres:18
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-volume:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: jkobdb
+      POSTGRES_PASSWORD: "123456"
+
+  pgadmin:
+    image: dpage/pgadmin4:9.18
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jkob@example.pl
+      PGADMIN_DEFAULT_PASSWORD: jkob
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+volumes:
+  pg-volume:
+  pgadmin:
+
+    
+
+
+
