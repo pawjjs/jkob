@@ -5,5 +5,4 @@ const router = Router();
 
 router.get("/", getGames);
 router.post("/", addGame);
-
 export default router;

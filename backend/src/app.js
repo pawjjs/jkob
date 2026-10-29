@@ -1,6 +1,7 @@
 import express from "express";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from "./docs/swagger.js";
+import YAML from "yaml";
+import { readFileSync } from "node:fs";
 import playersRouter from "./routes/players.js";
 import gamesRouter from "./routes/games.js";
 
@@ -8,25 +9,38 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api/players", playersRouter);
-app.use("/api/games", gamesRouter);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const spec = YAML.parse(
+    readFileSync(new URL("./openapi.yaml", import.meta.url), "utf8")
+);
 
-app.get("/", (req, res) => res.send("test"));
-app.get("/ping", (req, res) => res.json({ message: "pong" }));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
+
+app.use("/api/players", playersRouter);
+
+app.use("/api/games", gamesRouter);
+
+app.get("/", (req, res) => {
+    res.send("Backend Dormsy działa!");
+});
+
+app.get("/ping", (req, res) => {
+    res.json({ message: "pong" });
+});
 
 app.use((error, req, res, next) => {
-    const status = error.status >= 400 && error.status < 600 ? error.status : 500;
+    const status = error.status || 500;
+
+    if (status >= 500) {
+        console.error(error);
+    }
+
+    const message = error.type === "entity.parse.failed"
+        ? "Niepoprawny JSON"
+        : error.message;
+
     res.status(status).json({
-        error: status === 500 ? "Błąd serwera" : error.message
+        error: status >= 500 ? "Blad serwera" : message
     });
 });
 
 export default app;
-
-/*
-{
-  "nick": "Bartek",
-  "team": "Red"
-}
-*/ 
