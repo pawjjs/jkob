@@ -1,52 +1,25 @@
-import {writeFile} from "node:fs/promises"
-import {readFile} from "node:fs/promises"
-import Player from "../model/Player.js";
+import { findAllPlayers, findPlayerById, insertPlayer } from "../storage/playersDb.js";
 
-const playerFile = new URL("../../data/players.json", import.meta.url);
+export async function addPlayer(data) {
+    const nick = typeof data?.nick === "string" ? data.nick.trim() : "";
+    const team = typeof data?.team === "string" ? data.team.trim() : "";
 
-
-export async function addPlayer(dane)
-{
-    const {nick, team} = dane || {};
-
-    if (
-        typeof nick !== "string" || !nick.trim() ||
-        typeof team !== "string" || !team.trim()
-    ) {
+    if (!nick || !team) {
         const error = new Error("Podaj nick i drużynę");
         error.status = 400;
         throw error;
     }
 
-    const players = await readAllPlayers();
-    let maxId = 0;
-
-    for (const player of players) {
-    if (player.id > maxId) {
-        maxId = player.id;
-    }}
-
-    const id = maxId + 1;
-
-    const player = new Player(id, nick.trim(), team.trim());
-
-    players.push(player);
-
-    await writeFile(
-        playerFile,
-        JSON.stringify(players, null, 2),
-        "utf-8"
-    );
-
-    return player;
+    return insertPlayer(nick, team);
 }
 
-export async function readOnePlayer(id){
-    const players = await readAllPlayers();
-    return players.find(player => player.id === Number(id));
+export async function readOnePlayer(id) {
+    const playerId = Number(id);
+    if (!Number.isSafeInteger(playerId)) return undefined;
+
+    return findPlayerById(playerId);
 }
 
 export async function readAllPlayers() {
-    const data = await readFile(playerFile, "utf-8");
-    return JSON.parse(data);
+    return findAllPlayers();
 }
