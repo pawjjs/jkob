@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS players (
+    id INTEGER PRIMARY KEY,
+    nick TEXT NOT NULL,
+    team TEXT NOT NULL
+) STRICT;
+
+CREATE TABLE IF NOT EXISTS games (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL DEFAULT 'waiting',
+    winner_id INTEGER REFERENCES players(id)
+) STRICT;
+
+CREATE TABLE IF NOT EXISTS game_players (
+    game_id INTEGER NOT NULL REFERENCES games(id),
+    player_id INTEGER NOT NULL REFERENCES players(id),
+    position INTEGER NOT NULL,
+    PRIMARY KEY (game_id, position)
+) STRICT;
