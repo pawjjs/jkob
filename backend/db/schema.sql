@@ -17,3 +17,12 @@ CREATE TABLE IF NOT EXISTS game_players (
     position INTEGER NOT NULL,
     PRIMARY KEY (game_id, position)
 ) STRICT;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) STRICT;
