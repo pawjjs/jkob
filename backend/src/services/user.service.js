@@ -1,9 +1,13 @@
-export function createUserRepository(userRepository) {
+export function createUserService(userRepository) {
     return {
-        async createUser(username, password, email) {
-            if(username.length >= 5 && password.length >= 8) {
-            return userRepository.save({ username, password, email, created_at: new Date().toISOString() });
-        }
+         async createUser(username, password, email) {
+            if(await userRepository.existsByUsername(username)) {
+                throw Error("Użytkownik o podanej nazwie już istnieje.");
+            }
+            if(await userRepository.existsByEmail(email)) {
+                throw Error("Użytkownik o podanym adresie email już istnieje.");
+            }
+            return await userRepository.save({ username, password, email, created_at: new Date().toISOString() });
     }
 }
 }

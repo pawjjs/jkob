@@ -4,7 +4,11 @@ import YAML from "yaml";
 import { readFileSync } from "node:fs";
 import playersRouter from "./routes/players.js";
 import gamesRouter from "./routes/games.js";
-
+import { db } from "./storage/db.js";
+import { createUserRepository } from "./storage/user.repository.js";
+import { createUserService } from "./services/user.service.js";
+import { createUserController } from "./controllers/userController.js";
+import { createUserRouter } from "./routes/userRoutes.js";
 const app = express();
 
 app.use(express.json());
@@ -12,6 +16,8 @@ app.use(express.json());
 const spec = YAML.parse(
     readFileSync(new URL("./openapi.yaml", import.meta.url), "utf8")
 );
+
+app.use("/api/users", createUserRouter(createUserController(createUserService(createUserRepository(db)))));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
 
