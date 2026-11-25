@@ -1,8 +1,8 @@
 openapi: 3.0.4
 info:
   title: Dormsy API
-  version: 1.0.0
-  description: API gry Dormsy. Pozwala dodawać i przeglądać graczy oraz tworzyć i przeglądać gry.
+  version: 1.1.0
+  description: API gry Dormsy. Pozwala zarządzać graczami i pokojami rozgrywek, dołączać do pokojów, opuszczać je oraz rozpoczynać gry.
 servers:
   - url: http://localhost:3000
 tags:
@@ -110,6 +110,142 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
       description: Nazwa nie moze byc pusta ani identyczna z nazwa istniejacej gry.
+  /api/games/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        example: 1
+    get:
+      tags:
+        - Gry
+      summary: Pobierz rozgrywkę po ID
+      responses:
+        "200":
+          description: Szczegóły rozgrywki
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    patch:
+      tags:
+        - Gry
+      summary: Rozpocznij rozgrywkę
+      description: Gra musi oczekiwać na graczy i posiadać dwóch uczestników.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - playing
+                  example: playing
+      responses:
+        "200":
+          description: Rozgrywka rozpoczęta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/games/{id}/players:
+    post:
+      tags:
+        - Gry
+      summary: Dołącz gracza do rozgrywki
+      description: Gracz może dołączyć tylko do gry oczekującej na uczestników, jeżeli jest wolne miejsce.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - playerId
+              properties:
+                playerId:
+                  type: integer
+                  minimum: 1
+                  example: 2
+      responses:
+        "201":
+          description: Gracz dołączył do rozgrywki
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/games/{id}/players/{playerId}:
+    delete:
+      tags:
+        - Gry
+      summary: Usun gracza z rozgrywki
+      description: Gracz moze opuscic pokoj przed rozpoczeciem rozgrywki.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 1
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 2
+      responses:
+        "204":
+          description: Gracz opuscil gre
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/ServerError"  
   /:
     get:
       tags:
@@ -226,13 +362,21 @@ components:
           example:
             error: Niepoprawny JSON
     NotFound:
-      description: Nie znaleziono gracza
+      description: Nie znaleziono zasobu
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
           example:
-            error: Nie znaleziono gracza
+            error: Nie znaleziono gry
+    Conflict:
+      description: Konflikt z aktualnym stanem rozgrywki
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: Pokoj jest pelny
     ServerError:
       description: Blad serwera
       content:
