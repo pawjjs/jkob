@@ -17,3 +17,6 @@ CREATE TABLE IF NOT EXISTS game_players (
     position INTEGER NOT NULL,
     PRIMARY KEY (game_id, position)
 ) STRICT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_game_players_unique
+ON game_players (game_id, player_id);
